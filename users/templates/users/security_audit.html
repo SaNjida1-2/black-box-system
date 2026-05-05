@@ -1,0 +1,44 @@
+{% extends "blog/base.html" %}
+{% block content %}
+<div class="content-section">
+    <h2 class="text-danger border-bottom pb-2">BlackBox - Security Audit</h2>
+    
+    <!-- Requirement: View all users -->
+    <div class="mt-4">
+        <h4>User Database ({{ user_count }} Users)</h4>
+        <ul class="list-group mb-4">
+            {% for u in all_users %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ u.username }} ({{ u.email }})
+                    <span class="badge badge-info">{{ u.profile.role }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Requirement: Run integrity checks / Detect modifications -->
+    <div class="mt-4">
+        <h4>Data Integrity Log (MAC Verification)</h4>
+        <table class="table table-hover mt-2">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Post ID</th>
+                    <th>Author</th>
+                    <th>Encryption</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in integrity_results %}
+                <tr>
+                    <td>#{{ item.post.id }}</td>
+                    <td>{{ item.post.author }}</td>
+                    <td>{{ item.encryption }}</td>
+                    <td><span class="text-success">✔ {{ item.status }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}

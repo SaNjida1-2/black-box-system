@@ -29,7 +29,7 @@ class Profile(models.Model):
     # -------------------------------------
 
     name = models.CharField(max_length=25,blank=True)
-    image = models.ImageField(default='default.jpg', upload_to='profile_pics') # Added a default
+    image = models.ImageField(default='default.jpg', upload_to='profile_pics', null=True, blank=True)
     image_thumbnail_user = ImageSpecField(source='image',
                                       processors=[Transpose(),ResizeToFill(170, 170)],
                                       format='JPEG',

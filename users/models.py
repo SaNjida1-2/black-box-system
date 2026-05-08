@@ -19,6 +19,14 @@ WING = [
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+# ... teammate's 1 code ...
+    encrypted_email = models.TextField(blank=True, null=True)
+    rsa_public_key = models.TextField(blank=True, null=True)
+    rsa_private_key = models.TextField(blank=True, null=True)
+
+
+    
     # --- MEMBER 3: SECURITY EXTENSIONS ---
     ROLE_CHOICES = [('ADMIN', 'Admin/Auditor'), ('USER', 'Regular User')]
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='USER')

@@ -1,5 +1,6 @@
 import os
 
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = '6+_(6czw@+gbm$5q@j6u#ubk^)19o&0+3wi!2u(%x^^y^!d(j#'
@@ -138,6 +139,13 @@ SESSION_COOKIE_HTTPONLY = True  # Prevents JavaScript from accessing session coo
 SESSION_COOKIE_SECURE = False    # Set to False for Local Development (True requires HTTPS)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True # Wipes session when the browser is closed
 
-# settings.py
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'security@blackbox.com'
+
+# --- MEMBER 3: REAL EMAIL CONFIGURATION (SMTP) ---
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'sanjida.buetsat1@gmail.com'      # Use your actual Gmail address
+EMAIL_HOST_PASSWORD = 'uyuwckjeunzqxgjf'  # Paste your App Password here (no spaces)
+DEFAULT_FROM_EMAIL = 'BlackBox Security <your-email@gmail.com>'
+

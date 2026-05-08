@@ -13,6 +13,7 @@ from django.core.exceptions import PermissionDenied
 from blog.models import Post
 import random
 from django.core.mail import send_mail
+from django.conf import settings
 
 def register(request):
     if request.method == 'POST':
@@ -127,30 +128,22 @@ def  change_password(request):
 
 
 def send_otp_email(user):
-    # 1. Generate a random 6-digit OTP
     otp = str(random.randint(100000, 999999))
-    
-    # 2. Save it to the user's profile (we added this field earlier)
     user.profile.two_factor_secret = otp
     user.profile.save()
     
-    # 3. Send the email
-    send_mail(
-        'BlackBox - Your Security OTP',
-        f'Your 6-digit verification code is: {otp}. It is valid for this session.',
-        'security@blackbox.com',
-        [user.email],
-        fail_silently=False,
-    )
+    subject = 'BlackBox Vault - Your Security OTP'
+    message = f'Hello {user.username},\n\nYour 6-digit verification code is: {otp}\n\nThis code is required to unlock the secure vault.'
+    
+    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
 
 def two_factor_verify(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    # FORCE SEND: If no OTP exists or if they just arrived via GET request
     if request.method == 'GET' and not request.session.get('otp_sent'):
         send_otp_email(request.user)
-        request.session['otp_sent'] = True # Prevents spamming emails on refresh
+        request.session['otp_sent'] = True
         messages.info(request, f"A security code has been sent to your terminal/email.")
 
     if request.method == 'POST':
@@ -159,7 +152,7 @@ def two_factor_verify(request):
         
         if user_input == stored_otp:
             request.session['2fa_verified'] = True
-            request.session['otp_sent'] = False # Reset for next login
+            request.session['otp_sent'] = False
             request.user.profile.two_factor_secret = None 
             request.user.profile.save()
             return redirect('/')

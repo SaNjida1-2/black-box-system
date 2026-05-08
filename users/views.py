@@ -19,8 +19,9 @@ from django.core.mail import send_mail
 # Security imports - Ensure these files exist in your 'security' folder
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'security')))
 try:
-    from rsa_engine import generate_keys, encrypt, decrypt 
-    from hash_engine import hash_password 
+    from security.rsa_engine import generate_keys, encrypt, decrypt 
+    from security.hash_engine import hash_password 
+    from security.ecc_engine import ecc_decrypt, verify_hmac
 except ImportError:
     print("Warning: Security engines not found. Check your security folder.")
 
@@ -164,7 +165,18 @@ def profile(request, username=None):
     except:
         decrypted_email = "Unable to decrypt"
 
-    post_list = Post.objects.filter(author=user).order_by('-id')
+    post_list_raw = Post.objects.filter(author=user).order_by('-id')
+    
+    # --- DECRYPTION LAYER ---
+    for p in post_list_raw:
+        if p.is_encrypted:
+            if verify_hmac(p.content, p.hmac):
+                p.content = ecc_decrypt(p.content, 123)
+                p.title = ecc_decrypt(p.title, 123)
+            else:
+                p.content = "⚠️ [DATA TAMPERED]"
+
+    post_list = post_list_raw
     paginator = Paginator(post_list, 4)
     page = request.GET.get('page', 1)
     try:

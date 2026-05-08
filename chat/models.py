@@ -17,4 +17,8 @@ class Message(models.Model):
 
     is_group_message = models.BooleanField(default=True)
     recipient = models.ManyToManyField(User, blank=True, related_name='recipient')
+    
+    # --- SECURITY FIELDS ---
+    hmac = models.CharField(max_length=64, blank=True, null=True)
+    is_encrypted = models.BooleanField(default=False)
 

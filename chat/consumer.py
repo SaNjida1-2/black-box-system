@@ -8,7 +8,8 @@ import os
 
 # Import your RSA engine (Member 1's work)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'security')))
-from rsa_engine import encrypt # Or your specific signature function
+from security.rsa_engine import encrypt # Or your specific signature function
+from security.ecc_engine import ecc_encrypt, ecc_decrypt, generate_hmac, generate_ecc_keys
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
@@ -53,14 +54,19 @@ class ChatConsumer(WebsocketConsumer):
 
         chat_room, created = ChatRoom.objects.get_or_create(room_name=self.room_name)
         
-        # Save message with Signature
+        # --- ECC ENCRYPTION FOR CHAT ---
+        pub_key, _ = generate_ecc_keys()
+        encrypted_msg = ecc_encrypt(message_text, pub_key)
+        msg_hmac = generate_hmac(encrypted_msg) # MAC of Ciphertext
+
+        # Save message with Signature and ECC Encryption
         message = Message.objects.create(
             room=chat_room,
             sender=sender_user,
-            message=message_text,
+            message=encrypted_msg, # Store encrypted
+            hmac=msg_hmac,
+            is_encrypted=True,
             is_group_message=is_group,
-            # Ensure your Message model has a field for 'signature'
-            # digital_signature=digital_signature 
         )
 
         # Recipient Logic

@@ -1,6 +1,3 @@
-
-# security/rsa_engine.py
-
 def gcd(a, b):
     while b:
         a, b = b, a % b

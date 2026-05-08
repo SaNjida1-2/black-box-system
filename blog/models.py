@@ -29,6 +29,11 @@ class Post(models.Model):
     likes = models.ManyToManyField(User, related_name='likes',blank=True)
     tagged_users = models.ManyToManyField(User, related_name='tagged_users',blank=True)
 
+    # --- SECURITY FIELDS ---
+    hmac = models.CharField(max_length=64, blank=True, null=True)
+    title_hmac = models.CharField(max_length=64, blank=True, null=True)
+    is_encrypted = models.BooleanField(default=False)
+
     @property
     def total_likes(self):
         return self.likes.count()
@@ -75,6 +80,10 @@ class Comment(models.Model):
     comment = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     date_posted = models.DateTimeField(default=timezone.now)
+
+    # --- SECURITY FIELDS ---
+    hmac = models.CharField(max_length=64, blank=True, null=True)
+    is_encrypted = models.BooleanField(default=False)
 
     def __str__(self):
         return self.comment

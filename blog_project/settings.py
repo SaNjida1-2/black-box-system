@@ -29,6 +29,7 @@ INSTALLED_APPS = [
 
     # Third_party_apps.
     'crispy_forms',
+    'crispy_bootstrap4',
     # taggit
     'taggit',
     #forthumbnails
@@ -141,3 +142,5 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True # Wipes session when the browser is close
 # settings.py
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'security@blackbox.com'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+CRISPY_TEMPLATE_PACK = "bootstrap4"

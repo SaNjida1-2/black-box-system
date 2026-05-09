@@ -47,7 +47,7 @@
                 <a class="nav-item nav-link" href="{% url 'profile' request.user.username %}">Profile </a>
                 
                 <!-- MEMBER 3: Security Audit Link (Only visible to Admins) -->
-                {% if user.profile.role == 'ADMIN' %}
+                {% if user.is_staff or user.profile.role == 'ADMIN' %}
                     <a class="nav-item nav-link text-warning" href="{% url 'security-audit' %}">
                         <i class="fa-solid fa-shield-halved"></i> Audit
                     </a>

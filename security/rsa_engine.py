@@ -1,3 +1,6 @@
+
+# security/rsa_engine.py
+
 def gcd(a, b):
     while b:
         a, b = b, a % b
@@ -80,3 +83,39 @@ def decrypt(ciphertext, private_key):
     decrypted_padded = modular_exponentiation(ciphertext, d, n)
     # Remove padding after decryption
     return remove_padding(decrypted_padded)
+
+# --- 5. HASHING (From Scratch, No Built-in) ---
+def custom_hash(message):
+    """
+    A simple from-scratch hashing algorithm (DJB2 variant) 
+    to meet the requirement of no built-in hash functions.
+    Produces a 32-bit integer hash.
+    """
+    hash_value = 5381
+    for char in message:
+        # hash * 33 + ord(char)
+        hash_value = ((hash_value << 5) + hash_value) + ord(char)
+        hash_value &= 0xFFFFFFFF # Keep it to 32 bits
+    return hash_value
+
+# --- 6. DIGITAL SIGNATURE ---
+def sign_message(message, private_key):
+    """
+    Signs a message by hashing it and then encrypting the hash with the RSA private key.
+    """
+    d, n = private_key
+    # We modulo n because the hash could be larger than the modulus n in this lab demo
+    message_hash = custom_hash(message) % n
+    # S = H(M)^d mod n
+    signature = modular_exponentiation(message_hash, d, n)
+    return signature
+
+def verify_signature(message, signature, public_key):
+    """
+    Verifies a digital signature by decrypting it with the public key and comparing with the message hash.
+    """
+    e, n = public_key
+    # H'(M) = S^e mod n
+    decrypted_hash = modular_exponentiation(signature, e, n)
+    expected_hash = custom_hash(message) % n
+    return decrypted_hash == expected_hash

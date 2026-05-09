@@ -21,4 +21,4 @@ class Message(models.Model):
     # --- SECURITY FIELDS ---
     hmac = models.CharField(max_length=64, blank=True, null=True)
     is_encrypted = models.BooleanField(default=False)
-
+    signature = models.TextField(blank=True, null=True)

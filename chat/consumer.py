@@ -8,7 +8,8 @@ import os
 
 # Import your RSA engine (Member 1's work)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'security')))
-from security.rsa_engine import encrypt # Or your specific signature function
+from security.rsa_engine import encrypt, sign_message, verify_signature
+
 from security.ecc_engine import ecc_encrypt, ecc_decrypt, generate_hmac, generate_ecc_keys
 
 class ChatConsumer(WebsocketConsumer):
@@ -43,12 +44,18 @@ class ChatConsumer(WebsocketConsumer):
         # --- MEMBER 1: DIGITAL SIGNATURE ---
         # We sign the message using the sender's Private Key
         digital_signature = "UNSIGNED"
+        is_authentic = False
         try:
             priv_key = eval(sender_user.profile.rsa_private_key)
+            pub_key = eval(sender_user.profile.rsa_public_key)
+            
             # A signature is essentially encrypting a hash of the message with a private key
-            # For your lab, you can demonstrate it by 'signing' the message text
-            digital_signature = str(encrypt(message_text[:10], priv_key)) 
-            print(f"✅ Message signed by {username}")
+            digital_signature = str(sign_message(message_text, priv_key)) 
+            
+            # Verify the signature immediately to ensure authenticity before broadcasting
+            is_authentic = verify_signature(message_text, int(digital_signature), pub_key)
+            
+            print(f"✅ Message signed by {username}. Authenticity verified: {is_authentic}")
         except Exception as e:
             print(f"❌ Signature Error: {e}")
 
@@ -67,6 +74,7 @@ class ChatConsumer(WebsocketConsumer):
             hmac=msg_hmac,
             is_encrypted=True,
             is_group_message=is_group,
+            signature=digital_signature # Store the digital signature
         )
 
         # Recipient Logic
@@ -86,7 +94,8 @@ class ChatConsumer(WebsocketConsumer):
                 "username": username, # Now correctly pulled from Session
                 "sender_user_image": sender_user.profile.image.url if hasattr(sender_user.profile, 'image') else "/static/default.jpg",
                 "timestamp": message.timestamp,
-                "signature": digital_signature # Send signature to the room
+                "signature": digital_signature, # Send signature to the room
+                "is_authentic": is_authentic
             }
         )
 
@@ -98,7 +107,8 @@ class ChatConsumer(WebsocketConsumer):
             "username": event["username"], 
             "sender_user_image": event["sender_user_image"], 
             "timestamp": event["timestamp"].strftime('%I:%M %p'),
-            "signature": event.get("signature", "No Signature")
+            "signature": event.get("signature", "No Signature"),
+            "is_authentic": event.get("is_authentic", False)
         }))
 
 # import json

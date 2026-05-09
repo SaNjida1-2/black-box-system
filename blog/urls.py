@@ -1,5 +1,9 @@
 from django.urls import path
 from . import views
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 app_name = "blog"
 
@@ -18,3 +22,5 @@ urlpatterns = [
     path('<str:username>/notifications/count/',views.notifications_unread_count_view,name='notifications-count'),
 ]
 
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

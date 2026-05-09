@@ -103,7 +103,10 @@ AUTH_PASSWORD_VALIDATORS = [
     #     'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     # },
 ]
-
+PASSWORD_HASHERS = [
+    'users.apps.MyCustomHasher', # Direct path to the class in apps.py
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+]
 
 LANGUAGE_CODE = 'en-us'
 
